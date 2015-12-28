@@ -10,7 +10,7 @@ Later it can incorporate different, multiple protocols.
 For timebeing, it works on top of UDP and without any cryptography.
 
     //Create the cluster instance
-    var netcluster = require('../index')();
+    var netcluster = require('netcluster')();
 
     //binds event listener
     netcluster.on('a', function (msg) {
