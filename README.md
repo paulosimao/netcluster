@@ -1,7 +1,7 @@
 # netcluster
 Network based cluster for Node.js
 
-Default cluster lib works great as long as you´re in the same machine. Once you need to scale along multiple machines things start to get get complicated.
+Default cluster lib works great as long as you´re in the same machine. Once you need to scale along multiple machines things start to get complicated.
 
 This was the motivation to develop this lib.
 
