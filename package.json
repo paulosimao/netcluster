@@ -1,0 +1,33 @@
+{
+  "name": "netcluster",
+  "version": "0.0.1",
+  "description": "Network based cluster for Node.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/paulosimao/netcluster.git"
+  },
+  "keywords": [
+    "cluster",
+    "network",
+    "multi",
+    "protocol",
+    "udp"
+  ],
+  "author": "'Paulo Simão<'paulosimao@gmail.com'> ('http://github.com/paulosimao')",
+  "license": "GPL-2.0",
+  "bugs": {
+    "url": "https://github.com/paulosimao/netcluster/issues"
+  },
+  "homepage": "https://github.com/paulosimao/netcluster#readme",
+  "dependencies": {
+    "node-uuid": "^1.4.7"
+  },
+  "devDependencies": {
+    "chai": "^3.4.1",
+    "mocha": "^2.3.4"
+  }
+}
