@@ -1,6 +1,6 @@
 {
   "name": "netcluster",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Network based cluster for Node.js",
   "main": "index.js",
   "scripts": {
@@ -15,7 +15,14 @@
     "network",
     "multi",
     "protocol",
-    "udp"
+    "udp",
+    "ipc",
+    "inter process",
+    "process",
+    "emitter",
+    "message",
+    "remote",
+    "event"
   ],
   "author": "'Paulo Simão<'paulosimao@gmail.com'> ('http://github.com/paulosimao')",
   "license": "GPL-2.0",
