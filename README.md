@@ -9,25 +9,46 @@ Also, there are situations where your processed to be stand alone, but share com
 
 This was the motivation to develop this lib.
 
+In a short:
+
+*It exchanges messages locally through pipes, each pipe is mapped in a channel. Roles for propagating messages among channels can be defined. It also exchange messages through UDP and routing can also be defined.*
+
+*Conclusion: You can emit and listen to events in different processes and machines.*
+
 Later it can incorporate different, multiple protocols.
 
 For now, it works on top of UDP and Unix Socket / Windows Pipes and **without any cryptography**.
 
 How it works:
 
-1. You need to create a local server to coordinate unix sockets
+1. You need to create a local server to coordinate unix sockets (see ncserver_<platform> in case you wont create your own.)
 2. You need to connect to this server somehow (please see below)
 3. You may send and receive messages
 4. In case you want to exchange messages w different boxes, you need to enable UDP connection on the local server process.
-In this version, any package locally sent will be replicated remotelly - it is a mashup. Maybe later we can create channels to
-reduce uneeded network usage.
-
 ##### How to install:
     npm install -g netcluster
 
 In case you want to use provided server, the command ncserver will be available. If no parameters are provided,
 it will use the config.json in the same folder ncserver is, otherwise, provide the FULL PATH to the config file
 you want to use.
+
+- `ncserver_posix` - Command to start provided server on *nix
+- `ncserver_win` - Command to start provided server on windows
+- `ncclient_posix` - Command to start provided control client on *nix
+- `ncclient_win` - Command to start provided control client on windows
+
+Both accept Full Qualified Path to config file(see below) as the only parameter.
+
+##### Client Commands:
+
+Once you run ncclient, it will start a REPL, allowing you to issue the following functions:
+
+- `showconfig()`  : Dumps the active configuration on the server
+- `reloaconfig (path)` : Reloads the config. Mandatory parameter is the full path of file. Remember that `\` needs to be escaped (double them).
+- `showchannel (channame)` : <UNDER DEVELOPMENT >Shows you the uuid of clients connected to that channel.
+- `showclient (chan,uuid)`  : <UNDER DEVELOPMENT >Shows info about that client (Broken at the moment).
+
+**Please note these are functions available in REPL context, not REPL commands (the ones starting w/ .)**
 
 ##### Snippets:
 
@@ -68,7 +89,7 @@ you want to use.
       }
     }
 
-###### Local Server:
+###### Local Server (in case you want to embed):
 
     var fs = require('fs');
     var netcluster = require('../index').pipedserver();
@@ -111,9 +132,6 @@ you want to use.
 
 ##### Relevant Interface:
 
-###### BOTH:
- - `dumptoconsole` - Variable that if set to true will dump to console every message received. Works on both server and client.
-
 ###### Local Server:
 
 - `start: function ()` : Initiate local server and binds it to the associated path.
@@ -127,3 +145,7 @@ you want to use.
 - `removeListener(event, cb)`: Removes a listener.
 
 *For these, please refer to node events API* (https://nodejs.org/api/events.html)
+
+#### TODO:
+
+ - A lot of testing is required at the moment. Pleas provide feedback, and if possible register bugs into GITHUB (https://github.com/paulosimao/netcluster)

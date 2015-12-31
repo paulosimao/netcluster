@@ -1,0 +1,1 @@
+node %~dp0\ncserver.js %1

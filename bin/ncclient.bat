@@ -1,0 +1,1 @@
+node %~dp0\ncclient.js %1

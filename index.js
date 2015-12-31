@@ -121,6 +121,22 @@ var pipedserver = function () {
                     }
                     ret.emiter.emit('data', null, msg);
                 }
+            },
+
+            reload: function (cfg) {
+                ret.config = cfg;
+                for (var c in cfg.channels) {
+                    if (!ret.channels[c]) {
+                        createchannel(ret, c, ret.config.channels[c]);
+                    }
+                }
+                for (var c in ret.channels) {
+                    if (!ret.config.channels[c]) {
+                        ret.channels[c].stop();
+                    }
+                }
+            },
+            stop: function () {
             }
 
 
@@ -133,7 +149,10 @@ var pipedserver = function () {
 function createchannel(ret, name, cfg, cb) {
     var chan = {};
     chan.emiter = new EventEmitter();
+    chan.clients = {};
     chan.serverlocal = net.createServer(function (sock) {
+        sock.uuid = uuid.v4();
+        chan.clients[sock.uuid] = sock;
         sock.on('data', function (data) {
 
             if (cfg.dumptoconsole) {
@@ -173,20 +192,48 @@ function createchannel(ret, name, cfg, cb) {
 
     });
 
+    chan.stop = function () {
+        chan.emiter.removeAllListeners('data');
+        chan.serverlocal.close();
+        for (s in chan.clients) {
+            chan.clients[s].end();
+            delete chan.clients[s];
+        }
+        chan.clients = {};
+    }
+
 
     chan.serverlocal.listen(getpipefromchannel(name), cb);
     ret.channels[name] = chan;
 
 }
-
 function createagent(ret) {
     ctrlagent = pipedclient();
     ctrlagent.connect('control', function () {
         ctrlagent.on('nc-control-showconfig', function (msg) {
+            ctrlagent.emit('nc-control-showconfig-response', ret.config);
 
         });
         ctrlagent.on('nc-control-reloadconfig', function (msg) {
+            try {
+                ret.reload(msg.data);
+                ctrlagent.emit('nc-control-reloadconfig-response', 'done');
+            } catch (err) {
+                ctrlagent.emit('nc-control-reloadconfig-response', err);
+            }
 
+
+        });
+        ctrlagent.on('nc-control-showchannel', function (msg) {
+            var clients = [];
+            for (i in ret.channels[msg.data].clients) {
+                clients.push(i);
+            }
+            ctrlagent.emit('nc-control-showchannel-response', clients);
+        });
+
+        ctrlagent.on('nc-control-showclient', function (msg) {
+            ctrlagent.emit('nc-control-showclient-response', ret.channels[msg.data.channel].clients[msg.data.client]);
         });
     });
 }

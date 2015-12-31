@@ -1,13 +1,16 @@
 {
   "name": "netcluster",
-  "version": "0.1.001",
+  "version": "0.1.003",
   "description": "Network based cluster for Node.js",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
-    "ncserver": "./bin/ncserver"
+    "ncserver_win": "./bin/ncserver.bat",
+    "ncserver_posix": "./bin/ncserver.sh",
+    "ncclient_win": "./bin/ncclient.bat",
+    "ncclient_posix": "./bin/ncclient.sh"
   },
   "repository": {
     "type": "git",

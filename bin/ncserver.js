@@ -3,7 +3,7 @@
  */
 var fs = require('fs');
 var netcluster = require('../index').pipedserver();
-var confstr = fs.readFileSync(process.argv[2] ? process.argv[2] : 'config.json');
+var confstr = fs.readFileSync(process.argv[2] ? process.argv[2] : __dirname+'/config.json');
 var conf = JSON.parse(confstr);
 netcluster.config = conf;
 netcluster.start();
