@@ -3,266 +3,198 @@ var uuid = require('node-uuid');
 var dgram = require("dgram");
 var util = require('util');
 var net = require('net');
+var async = require('async');
 console.log('Loaded netcluster');
-//module.exports.tmp =    function () {
-//    var ret = {
-//            uuid: uuid.v4(),
-//            addr: undefined,
-//            path: '\\\\?\\pipe\\netcluster-default',
-//            port: 0,
-//            eventemiter: new EventEmitter(),
-//            eventemiterlocal: new EventEmitter(),
-//
-//            socket: undefined,
-//            socketlocal: undefined,
-//            serverlocal: undefined,
-//            debugtoconsole: undefined,
-//
-//            connect: function (port, addr, path, cb) {
-//                ret.connectlocal(path);
-//                ret.connectnet(port, addr, cb);
-//            },
-//
-//            connectlocal: function (path, cb) {
-//                if (path && util.isFunction(path)) {
-//                    cb = path;
-//                } else if (path && util.isString(path)) {
-//                    ret.path = path;
-//                }
-//                ret.socketlocal = net.createConnection(ret.path);
-//                ret.socketlocal.on('data', ret.onlocalmsg);
-//                ret.socketlocal.on('error', ret.onerror);
-//                ret.socketlocal.on('close', ret.onclose);
-//                ret.socketlocal.on('listening', ret.onlisten);
-//                process.nextTick(cb);
-//
-//            },
-//            connectnet: function (port, add, cb) {
-//                ret.addr = addr;
-//                ret.port = port;
-//                ret.path = path;
-//                ret.socket = dgram.createSocket("udp4");
-//                ret.socket.on('message', ret.ondatagram);
-//                ret.socket.on('error', ret.onerror);
-//                ret.socket.on('close', ret.onclose);
-//                ret.socket.on('listening', ret.onlisten);
-//
-//                ret.socket.bind(port, function () {
-//                    ret.socket.addMembership(ret.addr);
-//                    cb();
-//                });
-//
-//            },
-//
-//            initnetsender: function (port, addr) {
-//                ret.addr = addr;
-//                ret.port = port;
-//                ret.socket = dgram.createSocket("udp4");
-//            },
-//
-//            /**
-//             * Initiates Local Server (UnixSockets)
-//             * @param path - Path to be bound to server.
-//             */
-//            initlocalserver: function (path) {
-//                if (path) {
-//                    ret.path = path;
-//                }
-//                ret.serverlocal = net.createServer(function (sock) {
-//                    sock.on('data', ret.onlocalmsg);
-//                    sock.on('error', ret.onerror);
-//                    ret.eventemiterlocal.addListener()
-//                });
-//
-//                ret.serverlocal.listen(ret.path);
-//            },
-//            disconnectnet: function () {
-//                if (ret.socket) {
-//                    ret.socket.dropMembership(ret.addr);
-//                    ret.socket.close();
-//                }
-//            },
-//            disconnectlocal: function () {
-//                if (ret.socketlocal) {
-//                    ret.socketlocal.end();
-//                }
-//
-//            },
-//            disconnect: function () {
-//                ret.disconnectlocal();
-//                ret.disconnectnet();
-//            },
-//            emit: function (event, data, bcast) {
-//                if (ret.socketlocal) {
-//                    ret.emitlocal(event, data, bcast);
-//                }
-//                if (ret.socket) {
-//                    ret.emitnet(event, data, bcast);
-//                }
-//            },
-//            emitnet: function (event, data, bcast) {
-//                var packet = {
-//                    emmiteruuid: ret.uuid,
-//                    broadcast: bcast ? true : false,
-//                    event: event,
-//                    data: data
-//                };
-//
-//                var b = new Buffer(JSON.stringify(packet));
-//                ret.socket.send(b, 0, b.length, ret.port, ret.addr);
-//            },
-//        ,
-//
-//        on:
-//
-//    function (event, cb) {
-//        ret.onlocal(event, function () {
-//            ret.onremote(event, cb());
-//        });
-//    }
-//
-//    ,
-//    once: function (event, cb) {
-//        ret.oncelocal(event, function () {
-//            ret.onceremote(event, cb());
-//        });
-//    }
-//    ,
-//    onlocal: function (event, cb) {
-//        ret.eventemiterlocal.on(event, cb);
-//    }
-//    ,
-//    oncelocal: function (event, cb) {
-//        ret.eventemiterlocal.once(event, cb);
-//    }
-//    ,
-//    onnet: function (event, cb) {
-//        ret.eventemiter.on(event, cb);
-//    }
-//    ,
-//    oncenet: function (event, cb) {
-//        ret.eventemiter.once(event, cb);
-//    }
-//    ,
-//    /**
-//     * Event triggered once we have UDP messages
-//     * @param msg
-//     * @param info
-//     */
-//    ondatagram: function (msg, info) {
-//        var msgobj = JSON.parse(msg.toString());
-//        if (ret.debugtoconsole && new RegExp(ret.debugtoconsole).test(msgobj.event)) {
-//            console.log(msg.toString());
-//        }
-//        ret.eventemiter.emit(msgobj.event, msgobj);
-//        if (msgobj.broadcast && ret.eventemiterlocal) {
-//            ret.eventemiterlocal.emit(msgobj.event, msgobj);
-//        }
-//
-//    }
-//    ,
-//    /**
-//     * Event triggered once we have local msgs
-//     * @param msg
-//     * @param info
-//     */
-//    onlocalmsg: function (msg) {
-//        var msgobj = JSON.parse(msg.toString());
-//        if (ret.debugtoconsole && new RegExp(ret.debugtoconsole).test(msgobj.event)) {
-//            console.log(msg.toString());
-//        }
-//        ret.eventemiterlocal.emit('message', msg);
-//        if (msgobj.broadcast && ret.eventemiter) {
-//            ret.eventemiter.emit(msgobj.event, msgobj);
-//        }
-//    }
-//    ,
-//    onerror: function () {
-//    }
-//    ,
-//    onclose: function () {
-//    }
-//    ,
-//    onlisten: function () {
-//    }
-//}
-//    ;
-//
-//
-//    return ret;
-//};
-
 
 var pipedserver = function () {
-    var ret = {
-        path: undefined,
-        emiter: undefined,
-        /**
-         * Initiates Local Server (UnixSockets)
-         * @param path - Path to be bound to server.
-         */
-        initlocalserver: function (path) {
-            if (path) {
-                ret.path = path;
-            }
-            ret.emiter = new EventEmitter();
-            ret.serverlocal = net.createServer(function (sock) {
-                sock.on('data', function (data) {
-                    ret.emiter.emit('data', sock, data);
-                    if (ret.socket) {
-                        ret.socket.send(data, 0, data.length, ret.port, ret.addr);
+        var ret = {
+            path: undefined,
+            emiter: undefined,
+            localaddresses: {},
+            channels: {},
+            config: {
+                addr: '224.0.0.0',
+                port: 4454,
+                connecttonet: true,
+                dumpnet: true,
+                startcontrol: true,
+                channels: {
+                    control: {
+                        propagatetochannels: false,
+                        propagatetonet: false,
+                        dumptoconsole: false
+                    },
+
+                    A: {
+                        propagatetochannels: false,
+                        propagatetonet: false,
+                        dumptoconsole: false
+                    },
+                    B: {
+                        propagatetochannels: false,
+                        propagatetonet: false,
+                        dumptoconsole: false
                     }
 
-                });
-                sock.on('error', function (err) {
-                    console.error(err);
-                });
-                sock.ondatalistener = function (src, data) {
-                    if (sock != src || src == null) {
-                        sock.write(data)
-                    }
+                }
+            },
+            /**
+             * Starts the server based on its the config.json object
+             */
+            start: function (cb) {
 
-                };
-                sock.on('close', function () {
-                    ret.emiter.removeListener('data', sock.ondatalistener);
-                });
-                ret.emiter.on('data', sock.ondatalistener);
-            });
 
-            ret.serverlocal.listen(ret.path);
-        },
-        connectudp: function (port, addr, cb) {
-            ret.addr = addr;
-            ret.port = port;
-            ret.socket = dgram.createSocket("udp4");
-            ret.socket.on('message', ret.ondatagram);
-            ret.socket.on('error', function (err) {
-                console.error(err);
-            });
-            ret.socket.on('close', function () {
-                console.log('UDP Socket closed');
-            });
-
-            ret.socket.bind(port, function () {
-                ret.socket.addMembership(ret.addr);
-                if (cb) {
-                    cb();
+                var arr = [];
+                for (var chan in ret.config.channels) {
+                    arr.push(chan);
                 }
 
-            });
+                async.each(arr, function (achan, cb) {
+                    createchannel(ret, achan, ret.config.channels[achan], cb);
+                }, function (err) {
+                    if (err) {
+                        if (cb) {
+                            return cb(err, null);
+                        } else {
+                            return console.error(err);
+                        }
+                    }
+                    if (ret.config.startcontrol) {
+                        createagent(ret);
+                    }
+                    if (ret.config.connecttonet) {
+                        ret.connectudp(cb);
+                    } else {
+                        process.nextTick(function () {
+                            cb(null, 'ok');
+                        });
+                    }
+                });
+            },
 
-        },
-        ondatagram: function (msg) {
-            ret.emiter.emit('data', null, msg);
-        }
-    };
+            /**
+             * Connect to UDP Network
+             * @param port
+             * @param addr
+             * @param cb
+             */
+            connectudp: function (cb) {
+                ret.socket = dgram.createSocket("udp4");
+                ret.socket.on('message', ret.ondatagram);
+                ret.socket.on('error', function (err) {
+                    console.error(err);
+                });
+                ret.socket.on('close', function () {
+                    console.log('UDP Socket closed');
+                });
+
+                ret.socket.bind(ret.config.port, function () {
+                    ret.socket.addMembership(ret.config.addr);
+                    if (cb) {
+                        cb();
+                    }
+
+                });
+
+                //Lets map local ips so we can discard loopback messages...
+                var os = require('os');
+                var ifaces = os.networkInterfaces();
+
+                for (i in ifaces) {
+                    for (j in ifaces[i]) {
+                        if (ifaces[i][j].family && ifaces[i][j].family === 'IPv4') {
+                            ret.localaddresses[ifaces[i][j].address] = true;
+                        }
+                    }
+                }
+
+            },
+            /**
+             * Triggered upon arrival of UDP messages
+             * @param msg
+             * @param msginfo - brings metadata about the datagram
+             */
+            ondatagram: function (msg, msginfo) {
+                if (!ret.localaddresses[msginfo.address]) {
+                    if (ret.config.dumpnet) {
+                        console.log(msg.toString());
+                    }
+                    ret.emiter.emit('data', null, msg);
+                }
+            }
 
 
-    return ret;
-};
+        };
+
+        return ret;
+    }
+    ;
+
+function createchannel(ret, name, cfg, cb) {
+    var chan = {};
+    chan.emiter = new EventEmitter();
+    chan.serverlocal = net.createServer(function (sock) {
+        sock.on('data', function (data) {
+
+            if (cfg.dumptoconsole) {
+                console.log(data.toString());
+            }
+
+            chan.emiter.emit('data', sock, data);
+
+            if (cfg.propagatetochannels) {
+                var regex = new RegExp(cfg.propagatetochannels);
+                for (otherchan in ret.channels) {
+                    if (regex.test(otherchan)) {
+                        ret.channels[otherchan].emiter.emit('data', sock, data);
+                    }
+                }
+            }
+
+            if (cfg.propagatetonet && ret.socket) {
+                ret.socket.send(data, 0, data.length, ret.port, ret.addr);
+            }
+
+
+        });
+        sock.on('error', function (err) {
+            console.error(err);
+        });
+        sock.ondatalistener = function (src, data) {
+            if (sock != src || src == null) {
+                sock.write(data)
+            }
+
+        };
+        sock.on('close', function () {
+            chan.emiter.removeListener('data', sock.ondatalistener);
+        });
+        chan.emiter.on('data', sock.ondatalistener);
+
+    });
+
+
+    chan.serverlocal.listen(getpipefromchannel(name), cb);
+    ret.channels[name] = chan;
+
+}
+
+function createagent(ret) {
+    ctrlagent = pipedclient();
+    ctrlagent.connect('control', function () {
+        ctrlagent.on('nc-control-showconfig', function (msg) {
+
+        });
+        ctrlagent.on('nc-control-reloadconfig', function (msg) {
+
+        });
+    });
+}
+
 var pipedclient = function () {
     var ret = {
         emiter: undefined,
+        dumptoconsole: false,
         connect: function (path, cb) {
             if (path && util.isFunction(path)) {
                 cb = path;
@@ -270,11 +202,16 @@ var pipedclient = function () {
                 ret.path = path;
             }
             ret.emiter = new EventEmitter();
-            ret.socket = net.createConnection(ret.path);
+            ret.socket = net.createConnection(getpipefromchannel(ret.path));
             ret.socket.on('data', function (msg) {
                 var msgs = msg.toString().split('\0');
                 for (var msgi of msgs) {
                     if (msgi && msgi.length > 0) {
+
+                        if (ret.dumptoconsole) {
+                            console.log(msgi.toString());
+                        }
+
                         var msgobj = JSON.parse(msgi.toString());
                         ret.emiter.emit(msgobj.event, msgobj);
                     }
@@ -295,6 +232,7 @@ var pipedclient = function () {
         emit: function (event, data, bcast) {
             var packet = {
                 emmiteruuid: ret.uuid,
+                channel: ret.path,
                 broadcast: bcast ? true : false,
                 event: event,
                 data: data
@@ -316,5 +254,10 @@ var pipedclient = function () {
     };
     return ret;
 };
+
+function getpipefromchannel(chan) {
+    return (/^win/.test(process.platform) ? '\\\\?\\pipe\\netcluster-' : '/var/run/netcluster-') + chan
+}
+
 module.exports.pipedserver = pipedserver;
 module.exports.pipedclient = pipedclient;

@@ -1,0 +1,24 @@
+{
+  "addr": "224.0.0.0",
+  "port": 4454,
+  "dumpnet": true,
+  "connecttonet": true,
+  "startcontrol": true,
+  "channels": {
+    "control": {
+      "propagatetochannels": false,
+      "propagatetonet": false,
+      "dumptoconsole": false
+    },
+    "A": {
+      "propagatetochannels": ".*",
+      "propagatetonet": false,
+      "dumptoconsole": false
+    },
+    "B": {
+      "propagatetochannels": ".*",
+      "propagatetonet": false,
+      "dumptoconsole": false
+    }
+  }
+}
