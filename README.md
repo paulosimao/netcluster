@@ -184,8 +184,6 @@ run the command: `node bin\win_install_svc.js`
 Same as above, but command  at the end is: `node bin\win_uninstall_svc.js`
 
 
-##### Please note you will need packages node-windows and winreg as pre-req. I have not added this to package.json because this is specific to windows and tipically these packages are global.
-
 #### TODO:
 
  - A lot of testing is required at the moment. Pleas provide feedback, and if possible register bugs into GITHUB (https://github.com/paulosimao/netcluster)
