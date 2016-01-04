@@ -1,19 +1,34 @@
-var netcluster = require('../index')();
-var netcluster2 = require('../index')();
-describe('NETCLUSTER - TEST', function () {
-    it('Simple Test', function (done) {
+var Server        = require('../index').NCServer;
+var Agent         = require('../index').NCAgent;
+var child_process = require('child_process');
+var agent         = new Agent();
+var assert        = require('assert');
 
-        netcluster2.connectlocal('teste', function () {
-            netcluster2.onlocal('a', function (msg) {
-                console.log('A called:' + JSON.stringify(msg));
-                netcluster2.disconnect();
-                netcluster.disconnect();
-                done();
-            });
-        });
-        netcluster.connectlocal('teste', function () {
-            netcluster.emitlocal('a', {a: 1, b: 2});
-        });
-    });
+var server = undefined;
+var sender = undefined;
+describe('NETCLUSTER - TEST', function () {
+	before(function (done) {
+		server = child_process.fork('test/ch_server');
+		server.on('message', function (msg) {
+			sender = child_process.fork('test/ch_sender');
+			sender.on('message', function (msg) {
+				done();
+			});
+		});
+	});
+
+	it('Simple Test', function (done) {
+		agent = new Agent();
+		agent.connect('A', function () {
+			agent.on('.*', function (msg) {
+				console.log(msg);
+				assert.notEqual(null, msg);
+				agent.disconnect();
+				done();
+			});
+			//agent.emit('A', {a: 'A', b: 'B', c: 'C'});
+		});
+
+	});
 
 });
